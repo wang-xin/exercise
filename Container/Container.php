@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types=1);
+declare (strict_types = 1);
 
 class Container
 {
@@ -167,10 +167,14 @@ class Container
 
             }
 
+            // 获取类的构造函数
             $constructor = $reflect->getConstructor();
+            // print_r($constructor);die;
 
-            $args = $constructor ? $this->bindParams($reflect, $vars) : [];
+            // 获取构造函数参数
+            $args = $constructor ? $this->bindParams($constructor, $vars) : [];
 
+            // 从给出的参数创建一个新的类实例
             return $reflect->newInstanceArgs($args);
         } catch (ReflectionException $reflectionException) {
             throw new Exception('class not exists: ' . $class);
@@ -188,18 +192,25 @@ class Container
      */
     public function bindParams($reflect, $vars = [])
     {
+        // 获取参数数目
         if ($reflect->getNumberOfParameters() == 0) {
             return [];
         }
 
         reset($vars);
-        $type   = key($vars) === 0 ? 1 : 0;   // 1: 索引数组；2：关联数组
+        $type = key($vars) === 0 ? 1 : 0; // 1: 索引数组；2：关联数组
+
+        // 获取参数
         $params = $reflect->getParameters();
+        // print_r($params);die;
 
         $args = [];
         foreach ($params as $param) {
             $name  = $param->getName();
             $class = $param->getClass();
+
+            // print_r($name);
+            // print_r($class);die;
 
             if ($class) {
                 $args[] = $this->getObjectParam($class->getName(), $vars);
@@ -241,5 +252,3 @@ class Container
         return $result;
     }
 }
-
-
